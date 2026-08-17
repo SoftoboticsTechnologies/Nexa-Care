@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
+</helmet>
+<header style="position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);borderBottom:1px solid #E3E9F0">
+  <div style="maxWidth:1220px;margin:0 auto;padding:0 clamp(14px,4vw,24px);minHeight:72px;display:flex;align-items:center;gap:16px">
+    <div style="flex:1 1 0;display:flex;align-items:center;minWidth:0">
+      <a href="index.html" style="display:flex;align-items:center">
+        <img src="assets/nexacare-logo.png" alt="NexaCare Talent Mobility" style="height:clamp(34px,8vw,44px);maxWidth:100%;width:auto;display:block" />
+      </a>
+    </div>
+    <nav style="display:{{ dNav }};flex:0 0 auto;align-items:center;justify-content:center;gap:26px">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+        <a href="{{ it.href }}" style="fontFamily:'IBM Plex Sans',sans-serif;fontSize:15px;fontWeight:{{ it.weight }};color:{{ it.color }};textDecoration:none;whiteSpace:nowrap;paddingBottom:3px;borderBottom:2px solid {{ it.rule }}" style-hover="color:#008019">{{ it.label }}</a>
+      </sc-for>
+    </nav>
+    <div style="flex:1 1 0;display:flex;align-items:center;justify-content:flex-end">
+      <a href="Contact.dc.html" style="display:{{ dCta }};fontFamily:'IBM Plex Sans',sans-serif;fontSize:14px;fontWeight:600;color:#ffffff;background:#008019;padding:12px 20px;borderRadius:4px;textDecoration:none;whiteSpace:nowrap" style-hover="background:#006B15">Partner With Us</a>
+      <button onClick="{{ toggle }}" aria-label="Menu" style="display:{{ dBurger }};alignItems:center;justifyContent:center;width:44px;height:44px;background:#ffffff;border:1px solid #D3DFEB;borderRadius:4px;cursor:pointer;padding:0" style-hover="borderColor:#008019">
+        <span style="display:flex;flex-direction:column;gap:4px;align-items:center">
+          <span style="display:block;width:18px;height:2px;background:#00408F"></span>
+          <span style="display:block;width:18px;height:2px;background:#00408F"></span>
+          <span style="display:block;width:18px;height:2px;background:#00408F"></span>
+        </span>
+      </button>
+    </div>
+  </div>
+  <div style="display:{{ dPanel }};borderTop:1px solid #E3E9F0;background:#ffffff">
+    <div style="maxWidth:1220px;margin:0 auto;padding:12px clamp(14px,4vw,24px) 20px;display:flex;flex-direction:column">
+      <sc-for list="{{ items }}" as="it" hint-placeholder-count="6">
+        <a href="{{ it.href }}" style="fontFamily:'IBM Plex Sans',sans-serif;fontSize:16px;fontWeight:{{ it.weight }};color:{{ it.color }};textDecoration:none;padding:14px 2px;borderBottom:1px solid #EEF2F7" style-hover="color:#008019">{{ it.label }}</a>
+      </sc-for>
+      <a href="Contact.dc.html" style="marginTop:18px;fontFamily:'IBM Plex Sans',sans-serif;fontSize:15px;fontWeight:600;color:#ffffff;background:#008019;padding:14px 20px;borderRadius:4px;textDecoration:none;textAlign:center" style-hover="background:#006B15">Partner With Us</a>
+    </div>
+  </div>
+</header>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Home&quot;,&quot;About Us&quot;,&quot;Services&quot;,&quot;Our Team&quot;,&quot;Testimonials&quot;,&quot;Contact&quot;],&quot;default&quot;:&quot;Home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
+class Component extends DCLogic {
+  state = { mobile: false, open: false };
+  componentDidMount() {
+    this.mq = window.matchMedia("(max-width: 980px)");
+    this.sync = () => this.setState({ mobile: this.mq.matches, open: false });
+    this.sync();
+    this.mq.addEventListener("change", this.sync);
+  }
+  componentWillUnmount() {
+    if (this.mq) this.mq.removeEventListener("change", this.sync);
+  }
+  renderVals() {
+    const { mobile, open } = this.state;
+    const active = this.props.active || "";
+    const pages = [
+      ["Home", "index.html"],
+      ["About Us", "About.dc.html"],
+      ["Services", "Services.dc.html"],
+      ["Our Team", "Team.dc.html"],
+      ["Testimonials", "Testimonials.dc.html"],
+      ["Contact", "Contact.dc.html"]
+    ];
+    return {
+      dNav: mobile ? "none" : "flex",
+      dCta: mobile ? "none" : "inline-block",
+      dBurger: mobile ? "flex" : "none",
+      dPanel: mobile && open ? "block" : "none",
+      toggle: () => this.setState(s => ({ open: !s.open })),
+      items: pages.map(([label, href]) => {
+        const on = label === active;
+        return { label, href, weight: on ? 600 : 500, color: on ? "#00408F" : "#4A5A6E", rule: on ? "#008019" : "transparent" };
+      })
+    };
+  }
+}
+</script>
+</body>
+</html>
