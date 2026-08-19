@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="" />
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 </helmet>
-<header style="position:sticky;top:0;z-index:50;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);borderBottom:1px solid #E3E9F0">
+<header style="position:fixed;top:0;left:0;right:0;width:100%;z-index:50;background:rgba(255,255,255,0.97);backdrop-filter:blur(10px);borderBottom:1px solid #E3E9F0">
   <div style="maxWidth:1220px;margin:0 auto;padding:0 clamp(14px,4vw,24px);minHeight:72px;display:flex;align-items:center;gap:16px">
     <div style="flex:1 1 0;display:flex;align-items:center;minWidth:0">
       <a href="index.html" style="display:flex;align-items:center">
@@ -44,6 +44,7 @@
     </div>
   </div>
 </header>
+<div aria-hidden="true" style="height:73px"></div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props="{&quot;active&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;Home&quot;,&quot;About Us&quot;,&quot;Services&quot;,&quot;Our Team&quot;,&quot;Testimonials&quot;,&quot;Contact&quot;],&quot;default&quot;:&quot;Home&quot;,&quot;tsType&quot;:&quot;string&quot;}}">
 class Component extends DCLogic {
