@@ -126,7 +126,8 @@
             <span style="display:block;fontSize:13.5px;fontWeight:600;color:#28405C;marginBottom:7px">Message / requirement</span>
             <textarea name="message" rows="5" required="" placeholder="Roles needed, destination country, timelines, or your question" style="width:100%;boxSizing:border-box;fontFamily:'IBM Plex Sans',sans-serif;fontSize:15.5px;color:#152A42;padding:13px 14px;border:1px solid #D3DFEB;borderRadius:4px;resize:vertical;lineHeight:1.6" style-focus="borderColor:#008019;outline:none"></textarea>
           </label>
-          <button type="submit" style="justifySelf:start;fontFamily:'IBM Plex Sans',sans-serif;fontSize:15.5px;fontWeight:600;color:#ffffff;background:#008019;border:none;padding:15px 30px;borderRadius:4px;cursor:pointer;marginTop:4px" style-hover="background:#006B15">Submit enquiry</button>
+          <div style="display:{{ dError }};fontSize:14.5px;color:#C0392B;background:#FDECEA;border:1px solid #F3C4BE;borderRadius:4px;padding:11px 14px">Something went wrong sending your enquiry. Please try again, or call/WhatsApp us at +91 98805 04900.</div>
+          <button type="submit" disabled="{{ sending }}" style="justifySelf:start;fontFamily:'IBM Plex Sans',sans-serif;fontSize:15.5px;fontWeight:600;color:#ffffff;background:#008019;border:none;padding:15px 30px;borderRadius:4px;cursor:pointer;marginTop:4px;opacity:{{ btnOpacity }}" style-hover="background:#006B15">{{ btnLabel }}</button>
         </form>
       </div>
       <div style="display:{{ dSent }};padding:20px 0">
@@ -142,32 +143,47 @@
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script>
+const CONTACT_FORM_ENDPOINT = "https://k5iewetbri.execute-api.ap-south-1.amazonaws.com/prod/contact";
+
 class Component extends DCLogic {
-  state = { sent: false };
+  state = { sent: false, sending: false, error: false };
   renderVals() {
+    const { sent, sending, error } = this.state;
     return {
-      dForm: this.state.sent ? "none" : "block",
-      dSent: this.state.sent ? "block" : "none",
-      submit: e => {
+      dForm: sent ? "none" : "block",
+      dSent: sent ? "block" : "none",
+      dError: error ? "block" : "none",
+      sending,
+      btnLabel: sending ? "Sending…" : "Submit enquiry",
+      btnOpacity: sending ? 0.7 : 1,
+      submit: async e => {
         e.preventDefault();
+        if (this.state.sending) return;
+        this.setState({ sending: true, error: false });
         const d = new FormData(e.target);
         const g = k => (d.get(k) || "").toString().trim();
-        const subject = "Website enquiry — " + (g("role") || "General") + " — " + g("name");
-        const body = [
-          "I am a: " + g("role"),
-          "Name: " + g("name"),
-          "Phone: " + g("phone"),
-          "Email: " + g("email"),
-          "Organisation: " + (g("organisation") || "—"),
-          "",
-          "Message / requirement:",
-          g("message")
-        ].join("\n");
-        window.location.href = "mailto:connect@nexacaretalent.com?subject=" +
-          encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
-        this.setState({ sent: true });
+        const payload = {
+          formName: "Contact enquiry",
+          role: g("role"),
+          name: g("name"),
+          phone: g("phone"),
+          email: g("email"),
+          organisation: g("organisation") || "—",
+          message: g("message")
+        };
+        try {
+          const res = await fetch(CONTACT_FORM_ENDPOINT, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+          });
+          if (!res.ok) throw new Error("Request failed");
+          this.setState({ sent: true, sending: false });
+        } catch (err) {
+          this.setState({ sending: false, error: true });
+        }
       },
-      reset: () => this.setState({ sent: false })
+      reset: () => this.setState({ sent: false, error: false })
     };
   }
 }
